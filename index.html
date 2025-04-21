@@ -107,15 +107,39 @@
                 ["WTG31", 24.0600, 120.2055],
             ];
 
-            // 標記 WTG 點 (滑鼠懸停時顯示名稱和經緯度)
-            wtg_coords.forEach(function(item) {
-                let tooltipContent = `${item[0]}<br>Lat: ${item[1].toFixed(4)}, Lng: ${item[2].toFixed(4)}`;
-                L.marker([item[1], item[2]]).bindTooltip(tooltipContent).addTo(leafletMap);
+            // 創建一個小的預設標記圖示
+            let smallIcon = L.icon({
+                iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconSize: [15, 25],
+                iconAnchor: [7.5, 25],
+                shadowSize: [25, 35],
+                shadowAnchor: [7.5, 35]
             });
 
-            // OSS 座標點 (預設標記)
+            // 標記 WTG 點 (滑鼠懸停時顯示名稱和經緯度)
+            wtg_coords.forEach(function(item) {
+                let latLng = [item[1], item[2]];
+                L.marker(latLng, { icon: smallIcon }).addTo(leafletMap);    // 縮小後的預設標記
+                let wtgNumber = item[0].substring(3);     // 提取 WTG 編號的數字部分
+                // 文字標記 (放置在標記下方)
+                let textIcon = L.divIcon({
+                    className: 'leaflet-div-icon',
+                    html: wtgNumber,
+                    iconAnchor: [0, 12] // 調整文字錨點以適應較小的標記
+                });
+                L.marker(latLng, { icon: textIcon, className: 'text-below-marker' }).addTo(leafletMap);
+            });
+
+            // OSS 座標點 (同時顯示縮小標記和文字)
             let oss_coords = [24.0868, 120.2074];
-            L.marker(oss_coords).bindTooltip("OSS").addTo(leafletMap);
+            L.marker(oss_coords, { icon: smallIcon }).addTo(leafletMap);
+            let ossTextIcon = L.divIcon({
+                className: 'leaflet-div-icon',
+                html: "OSS",
+                iconAnchor: [0, 12] // 調整文字錨點
+            });
+            L.marker(oss_coords, { icon: ossTextIcon, className: 'text-below-marker' }).addTo(leafletMap);
 
             // Boundary 座標點 (圓點標記)
             let boundaryA = [24.120922, 120.188075];
